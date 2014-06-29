@@ -1,0 +1,90 @@
+/**
+ * ELMENTS STYLES
+**/
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    color: #222;
+}
+
+p {
+    margin: 1em 0;
+}
+
+/**
+ * COMPONENTS STYLES
+**/
+
+.heading {
+    margin: 0;
+    padding: .6em;
+    color: #fff;
+    background: #5AADBB;
+    font-variant: small-caps;
+}
+
+.entry {
+    margin: .625em 0 1.25em;
+    overflow: hidden;
+    border-left: 3px solid #DD002A;
+}
+
+.entry-title {
+    margin: 0;
+    padding: .325em;
+    position: relative;
+    border: 1px dashed #CCC;
+    border-left: none;
+    border-right: none;
+    background: #fff;
+}
+
+.entry-title:before {
+    content: "✉ ";
+}
+
+/* For desktop users */
+.entry-title:hover {
+    cursor: pointer;
+}
+
+.entry-content {
+    opacity: 1;
+    height: auto;
+    overflow: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-transition: opacity .5s linear, height 0s .5s;
+    transition: opacity .5s linear, height 0s .5s;
+}
+
+.entry.is-collapsed .entry-content {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/**
+ * I set this on <p> and not on .entry-content on purpose.
+ * This way if one day we have multiple <p>'s in our article,
+ * we can wrap them in a div.entry-content and still have
+ * consistent look and feel.
+ */
+.entry p {
+    text-indent: .625em;
+    margin: .9375em .625em;
+}
+
+/**
+ * MEDIA QUERIES
+**/
+
+@media screen and (min-width: 960px) {
+    body {
+        width:  960px;
+        margin: 0 auto;
+    }
+}
