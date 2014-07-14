@@ -22,26 +22,39 @@
     }
 
     function addListeners() {
+        $newEntryForm.on('click', 'input[type="submit"]', checkForm);
         $newEntryForm.on('submit', onNewEntrySubmit);
         $entriesContainer.on('click', '.entry-delete', onEntryDelete);
         $entriesContainer.on('click', '.entry-edit', onEntryEditStart);
         $entriesContainer.on('click', '.entry-editCancel', onEntryEditCancel);
-        $entriesContainer.on('submit', '.entry-editForm', onEntryEditSave);
+        $entriesContainer.on('submit', '.editEntryForm', onEntryEditSave);
         $entriesContainer.on('click', '.entry-title', onEntryCollapse);
+        $('#newEntryFormToggle').on('click', onNewEntryFormToggle);
+    }
+
+    function checkForm() {
+        var formElems = $newEntryForm[0].elements;
+        var title = formElems.title.value;
+        var content = formElems.content.value;
+
+        $newEntryForm.removeClass('is-error');
+
+        if (title === '' || content === '') {
+            // cause recalculate style
+            $newEntryForm.width();
+            $newEntryForm.addClass('is-error');
+        }
     }
 
     function onNewEntrySubmit(e) {
-        var form = e.target;
-        var title = form.elements.title.value;
-        var content = form.elements.content.value;
-        var entry;
-
         e.preventDefault();
 
-        if (title === '' || content === '') {
-            form.classList.add('is-error');
-            return;
-        }
+        if ($newEntryForm.hasClass('is-error')) { return; }
+
+        var formElems = $newEntryForm[0].elements;
+        var title = formElems.title.value;
+        var content = formElems.content.value;
+        var entry;
 
         entry = {
             title: title,
@@ -49,8 +62,8 @@
             date:  Date.now()
         };
 
-        form.classList.remove('is-error');
-        form.reset();
+        $newEntryForm[0].reset();
+        $newEntryForm.addClass('is-collapsed');
 
         addEntryToStore(entry, showEntries);
     }
@@ -88,6 +101,10 @@
     function onEntryCollapse(e) {
         var $entry = $(e.target).parent();
         collapseToggleEntry($entry);
+    }
+
+    function onNewEntryFormToggle() {
+        $newEntryForm.toggleClass('is-collapsed');
     }
 
     function addEntryToStore(entry, cb) {
@@ -180,14 +197,14 @@
         html += '<div class="entry-actions">';
         html += '<span class="entry-actions-item entry-editCancel">cancel</span>';
         html += '</div>';
-        html += '<form class="entry-editForm">';
-        html += '<label>Title:';
+        html += '<form class="entryForm editEntryForm">';
+        html += '<label><span>Title:</span>';
         html += '<input type="text" name="title" value="' + entry.title + '">';
         html += '</label>';
-        html += '<label>Content:';
+        html += '<label><span>Content:</span>';
         html += '<textarea name="content">' + entry.content + '</textarea>';
         html += '</label>';
-        html += '<input type="submit" value="Save">';
+        html += '<input class="btn" type="submit" value="Save">';
         html += '</form>';
         html += '</div>';
 

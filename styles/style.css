@@ -18,12 +18,24 @@ p {
  * COMPONENTS STYLES
 **/
 
+.btn {
+    padding: .8em 1.2em;
+    border: none;
+    border-radius: 3px;
+    background: #5aadbb;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,.5);
+    cursor: pointer;
+}
+
 .heading {
     margin: 0;
     padding: .6em;
     color: #fff;
     background: #5AADBB;
     font-variant: small-caps;
+    z-index: 1;
+    position: relative;
 }
 
 .entry {
@@ -52,12 +64,41 @@ p {
 }
 
 .entry-content {
+    padding: .2em .7em;
     opacity: 1;
     height: auto;
     overflow: hidden;
     -webkit-transform: translate3d(0, 0, 0);
     -webkit-transition: opacity .5s linear, height 0s .5s;
     transition: opacity .5s linear, height 0s .5s;
+}
+
+.entry-date {
+    font-style: italic;
+    font-size: .9em;
+}
+
+.entry-actions {
+    margin-top: 1.25em;
+}
+
+.entry-actions-item {
+    display: inline-block;
+    margin-left: 1em;
+    padding: .3em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #0096c7;
+    text-shadow: 1px 1px 1px rgba(156, 156, 156, 0.5);
+}
+
+.entry-actions-item:hover {
+    text-decoration: none;
+}
+
+.entry-actions-item:first-child {
+    margin-left: 0;
 }
 
 .entry.is-collapsed .entry-content {
@@ -71,6 +112,18 @@ p {
    display: none;
 }
 
+.entry-contentEdit {
+    padding: .2em .7em;
+}
+
+.entry-contentEdit .entry-actions {
+    margin-bottom: 1em;
+}
+
+.entry-contentEdit .entry-editCancel:before {
+    content: "↩ ";
+}
+
 /**
  * I set this on <p> and not on .entry-content on purpose.
  * This way if one day we have multiple <p>'s in our article,
@@ -82,6 +135,128 @@ p {
     margin: .9375em .625em;
 }
 
+.newEntry {
+    margin-bottom: 3.125em;
+    padding: 0 1em;
+}
+
+.newEntry:after {
+    content: ""
+}
+
+.newEntry-header {
+    margin-right: -1em;
+    text-align: right;
+}
+
+.newEntry-header .btn {
+    display: inline-block;
+    margin-top: -.8em;
+    font-style: italic;
+    font-size: 1.1em;
+    z-index: 1;
+    position: relative;
+}
+
+.newEntryForm {
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-transition: all .9s;
+    transition: all .9s;
+    position: relative;
+}
+
+.newEntryForm.is-collapsed {
+    margin-top: -800px;
+}
+
+.entryForm label,
+.entryForm input,
+.entryForm textarea {
+    display: block;
+}
+
+.entryForm label {
+    margin-bottom: 1em;
+}
+
+.entryForm textarea,
+.entryForm input[type="text"] {
+    margin-top: .3em;
+    width: 100%;
+    max-width: 600px;
+}
+
+.entryForm textarea {
+    height: 150px;
+    max-height: 400px;
+}
+
+.entryForm label > span {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.entryForm.is-error input[type="submit"]{
+    -webkit-animation: shake .5s;
+    -moz-animation: shake .5s;
+    animation-name: shake .5s;
+}
+
+
+@-webkit-keyframes shake {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
+  }
+}
+
+@-moz-keyframes shake {
+  0%, 100% {
+    -moz-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  10%, 30%, 50%, 70%, 90% {
+    -moz-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  20%, 40%, 60%, 80% {
+    -moz-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translate3d(-10px, 0, 0);
+    -ms-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translate3d(10px, 0, 0);
+    -ms-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
+  }
+}
+
 /**
  * MEDIA QUERIES
 **/
@@ -90,5 +265,17 @@ p {
     body {
         width:  960px;
         margin: 0 auto;
+    }
+    .newEntry {
+        padding-left: 0;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    .newEntry {
+        min-height: 2em;
+    }
+   .newEntry-header .btn {
+        font-size: 1.5em;
     }
 }

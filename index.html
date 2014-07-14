@@ -14,17 +14,19 @@
     <main>
       <aside>
         <div class="newEntry">
-          <p class="newEntry-title">Add new entry</p>
-          <form class="newEntry-form" id="newEntryForm">
+          <div class="newEntry-header">
+            <span class="btn" id="newEntryFormToggle">Add new entry</span>
+          </div>
+          <form class="entryForm newEntryForm is-collapsed" id="newEntryForm">
             <label>
-              Title:
-              <input type="text" name="title" placeholder="Title"><br>
+              <span>Title:</span>
+              <input required type="text" name="title" placeholder="How my day went">
             </label>
             <label>
-              Content:
-              <textarea name="content" placeholder="Content"></textarea><br>
+              <span>Content:</span>
+              <textarea required name="content" placeholder="Today I had an amazing day!"></textarea>
             </label>
-            <input type="submit" value="Create!">
+            <input class="btn" type="submit" value="Create!">
           </form>
         </div>
       </aside>
