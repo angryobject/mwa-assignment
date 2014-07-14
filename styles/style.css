@@ -67,6 +67,10 @@ p {
     padding: 0;
 }
 
+.entry.is-editing .entry-content {
+   display: none;
+}
+
 /**
  * I set this on <p> and not on .entry-content on purpose.
  * This way if one day we have multiple <p>'s in our article,
