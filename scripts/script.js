@@ -29,6 +29,7 @@
         $entriesContainer.on('click', '.entry-editCancel', onEntryEditCancel);
         $entriesContainer.on('submit', '.editEntryForm', onEntryEditSave);
         $entriesContainer.on('click', '.entry-title', onEntryCollapse);
+        $entriesContainer.on('click', '.entry-image-header', onEntryImageCollapse);
         $('#newEntryFormToggle').on('click', onNewEntryFormToggle);
     }
 
@@ -136,6 +137,10 @@
         $newEntryForm.toggleClass('is-collapsed');
     }
 
+    function onEntryImageCollapse(e) {
+        $(e.target).next().toggleClass('is-collapsed');
+    }
+
     function addEntryToStore(entry, cb) {
         if (!entry.key) {
             entry.key = Date.now();
@@ -192,7 +197,8 @@
         if ($entry.hasClass('is-editing')) { return; }
 
         $entry.toggleClass('is-collapsed');
-        $entriesContainer.children().not($entry).addClass('is-collapsed');
+        $entriesContainer.children().not($entry).addClass('is-collapsed')
+            .find('.entry-image-content').addClass('is-collapsed');
     }
 
     function collapseAllEntries() {
@@ -212,10 +218,16 @@
 
         if (entry.geo) {
             html += '<div class="entry-image">';
+            html += '<span class="btn entry-image-header">Show map</span>';
+            html += '<div class="entry-image-content is-collapsed">';
             html += '<img src="http://maps.googleapis.com/maps/api/staticmap?';
             html += 'center=' + entry.geo.lat + ',' + entry.geo.lon;
             html += '&markers=color:blue%7C' + entry.geo.lat + ',' + entry.geo.lon;
             html += '&zoom=13&size=260x200">';
+            html += '<a target="_blank" href="https://www.google.com/maps/place/';
+            html += entry.geo.lat + ',' + entry.geo.lon + '">';
+            html += 'a bigger map</a>';
+            html += '</div>';
             html += '</div>';
         }
 

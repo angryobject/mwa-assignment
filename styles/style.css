@@ -79,10 +79,39 @@ p {
 }
 
 .entry-image {
-    margin-top: 1.25em;
+    font-size: .9em;
 }
 
-.entry-actions {
+.entry-image-header {
+    display: inline-block;
+    background: #669DD4;
+}
+
+.entry-image-content {
+    width: 260px;
+    margin-top: .2em;
+    text-align: right;
+}
+
+.entry-image-content.is-collapsed {
+    display: none;
+}
+
+.entry-image-content img {
+    display: block;
+}
+
+.entry-image-content a {
+    display: inline-block;
+    padding: .3em;
+    color: #669DD4;
+}
+
+.entry-image-content a:after {
+    content: "➥";
+}
+
+.entry-actions, .entry-image {
     margin-top: 1.25em;
 }
 
