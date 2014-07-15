@@ -38,6 +38,11 @@ p {
     position: relative;
 }
 
+.entries-empty {
+    font-variant: small-caps;
+    font-size: 1.1em;
+}
+
 .entry {
     margin: .625em 0 1.25em;
     overflow: hidden;
