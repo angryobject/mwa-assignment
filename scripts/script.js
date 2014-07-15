@@ -55,6 +55,7 @@
         var title = formElems.title.value;
         var content = formElems.content.value;
         var entry;
+        var geoTimer;
 
         entry = {
             title: title,
@@ -62,10 +63,38 @@
             date:  Date.now()
         };
 
-        $newEntryForm[0].reset();
-        $newEntryForm.addClass('is-collapsed');
+        if (navigator.geolocation) {
+            geoTimer = setTimeout(onGeoFail, 20000);
+            navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoFail, {timeout:10000});
+            $newEntryForm.addClass('is-submitting');
+        } else {
+            saveEntry();
+        }
 
-        addEntryToStore(entry, showEntries);
+        function onGeoSuccess(pos) {
+            if (geoTimer) {
+                clearTimeout(geoTimer);
+                entry.geo = {
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude
+                };
+                saveEntry();
+            }
+        }
+
+        function onGeoFail() {
+            clearTimeout(geoTimer);
+            geoTimer = null;
+            saveEntry();
+        }
+
+        function saveEntry() {
+            $newEntryForm[0].reset();
+            $newEntryForm.addClass('is-collapsed');
+            $newEntryForm.removeClass('is-submitting');
+
+            addEntryToStore(entry, showEntries);
+        }
     }
 
     function onEntryDelete(e) {
@@ -180,6 +209,16 @@
         html += entry.content.replace(/\n/g, '<br/>');
         html += '</p>';
         html += '<time class="entry-date">Posted on: ' + new Date(entry.date).toLocaleString() + '</time>';
+
+        if (entry.geo) {
+            html += '<div class="entry-image">';
+            html += '<img src="http://maps.googleapis.com/maps/api/staticmap?';
+            html += 'center=' + entry.geo.lat + ',' + entry.geo.lon;
+            html += '&markers=color:blue%7C' + entry.geo.lat + ',' + entry.geo.lon;
+            html += '&zoom=13&size=260x200">';
+            html += '</div>';
+        }
+
         html += '<div class="entry-actions">';
         html += '<span class="entry-actions-item entry-edit">edit</span>';
         html += '<span class="entry-actions-item entry-delete">delete</span>';

@@ -78,6 +78,10 @@ p {
     font-size: .9em;
 }
 
+.entry-image {
+    margin-top: 1.25em;
+}
+
 .entry-actions {
     margin-top: 1.25em;
 }
@@ -167,6 +171,17 @@ p {
 
 .newEntryForm.is-collapsed {
     margin-top: -800px;
+}
+
+.newEntryForm.is-submitting:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: url(../images/spinner.gif) center center no-repeat;
+    background-color: rgba(255,255,255,.7);
 }
 
 .entryForm label,
