@@ -44,6 +44,7 @@
             // cause recalculate style
             $newEntryForm.width();
             $newEntryForm.addClass('is-error');
+            if (navigator.vibrate) { navigator.vibrate(100); }
         }
     }
 
