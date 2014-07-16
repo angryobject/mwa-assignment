@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="styles/style.css">
   </head>
   <body>
-    <h1 class="heading">My Diary Entries</h1>
+  <div class="wrap">
+
+    <header>
+      <h1 class="heading">My Diary Entries</h1>
+    </header>
 
     <main>
       <aside>
         <div class="newEntry">
           <div class="newEntry-header">
-            <span class="btn" id="newEntryFormToggle">Add new entry</span>
+            <h2 role="button" class="btn" id="newEntryFormToggle">Add new entry</h2>
           </div>
           <form class="entryForm newEntryForm is-collapsed" id="newEntryForm">
             <label>
@@ -32,6 +36,13 @@
       </aside>
       <div class="entries" id="entries"></div>
     </main>
+
+    <div class="footer footer-push"></div>
+    <footer class="footer">
+      MWA Assignment © Max Shishkin
+    </foorer>
+
+  </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"></script>
     <script>

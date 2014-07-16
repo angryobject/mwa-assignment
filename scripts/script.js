@@ -215,11 +215,12 @@
         html += '<p>';
         html += entry.content.replace(/\n/g, '<br/>');
         html += '</p>';
+        html += '<footer>';
         html += '<time class="entry-date">Posted on: ' + new Date(entry.date).toLocaleString() + '</time>';
 
         if (entry.geo) {
             html += '<div class="entry-image">';
-            html += '<span class="btn entry-image-header">Show map</span>';
+            html += '<span role="button" class="btn entry-image-header">Show map</span>';
             html += '<div class="entry-image-content is-collapsed">';
             html += '<img src="http://maps.googleapis.com/maps/api/staticmap?';
             html += 'center=' + entry.geo.lat + ',' + entry.geo.lon;
@@ -233,9 +234,10 @@
         }
 
         html += '<div class="entry-actions">';
-        html += '<span class="entry-actions-item entry-edit">edit</span>';
-        html += '<span class="entry-actions-item entry-delete">delete</span>';
+        html += '<span role="button" class="entry-actions-item entry-edit">edit</span>';
+        html += '<span role="button" class="entry-actions-item entry-delete">delete</span>';
         html += '</div>';
+        html += '</footer>';
         html += '</div>';
         html += '</article>';
 
@@ -247,7 +249,7 @@
 
         html += '<div class="entry-contentEdit">';
         html += '<div class="entry-actions">';
-        html += '<span class="entry-actions-item entry-editCancel">cancel</span>';
+        html += '<span role="button" class="entry-actions-item entry-editCancel">cancel</span>';
         html += '</div>';
         html += '<form class="entryForm editEntryForm">';
         html += '<label><span>Title:</span>';

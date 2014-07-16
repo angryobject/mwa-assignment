@@ -6,6 +6,10 @@
     box-sizing: border-box;
 }
 
+body, html {
+    height: 100%;
+}
+
 body {
     color: #222;
 }
@@ -15,7 +19,7 @@ p {
 }
 
 /**
- * COMPONENTS STYLES
+ * GENERAL STYLES
 **/
 
 .btn {
@@ -28,6 +32,17 @@ p {
     cursor: pointer;
 }
 
+/**
+ * COMPONENTS STYLES
+**/
+
+/** BASE LAYOUT **/
+
+.wrap {
+    position: relative;
+    min-height: 100%;
+}
+
 .heading {
     margin: 0;
     padding: .6em;
@@ -38,10 +53,23 @@ p {
     position: relative;
 }
 
+.footer {
+    height: 50px;
+    padding: 0 1em;
+    position: absolute;
+    bottom: 0;
+}
+
+.footer-push {
+    position: static;
+}
+
 .entries-empty {
     font-variant: small-caps;
     font-size: 1.1em;
 }
+
+/** ENTRY **/
 
 .entry {
     margin: .625em 0 1.25em;
@@ -173,50 +201,7 @@ p {
     margin: .9375em .625em;
 }
 
-.newEntry {
-    margin-bottom: 3.125em;
-    padding: 0 1em;
-}
-
-.newEntry:after {
-    content: ""
-}
-
-.newEntry-header {
-    margin-right: -1em;
-    text-align: right;
-}
-
-.newEntry-header .btn {
-    display: inline-block;
-    margin-top: -.8em;
-    font-style: italic;
-    font-size: 1.1em;
-    z-index: 1;
-    position: relative;
-}
-
-.newEntryForm {
-    -webkit-transform: translate3d(0, 0, 0);
-    -webkit-transition: all .9s;
-    transition: all .9s;
-    position: relative;
-}
-
-.newEntryForm.is-collapsed {
-    margin-top: -800px;
-}
-
-.newEntryForm.is-submitting:after {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    background: url(../images/spinner.gif) center center no-repeat;
-    background-color: rgba(255,255,255,.7);
-}
+/** ENTRY FORM **/
 
 .entryForm label,
 .entryForm input,
@@ -251,6 +236,54 @@ p {
     animation-name: shake .5s;
 }
 
+/** NEW ENTRY BLOCK & FORM **/
+
+.newEntry {
+    margin-bottom: 3.125em;
+    padding: 0 1em;
+}
+
+.newEntry-header {
+    margin-right: -1em;
+    text-align: right;
+}
+
+.newEntry-header .btn {
+    display: inline-block;
+    margin-top: -.8em;
+    margin-bottom: 0;
+    font-style: italic;
+    font-weight: normal;
+    font-size: 1.1em;
+    z-index: 1;
+    position: relative;
+}
+
+.newEntryForm {
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-transition: all .9s;
+    transition: all .9s;
+    position: relative;
+}
+
+.newEntryForm.is-collapsed {
+    margin-top: -800px;
+}
+
+.newEntryForm.is-submitting:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: url(../images/spinner.gif) center center no-repeat;
+    background-color: rgba(255,255,255,.7);
+}
+
+/**
+ * ANIMATIONS
+**/
 
 @-webkit-keyframes shake {
   0%, 100% {
