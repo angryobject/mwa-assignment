@@ -2,209 +2,252 @@
 (function () {
     'use strict';
 
-    var store;
-    var $newEntryForm;
-    var $entriesContainer;
+    // Storage
 
-    function init() {
-        $newEntryForm = $('#newEntryForm');
-        $entriesContainer = $('#entries');
+    var storeProto = {
+        add: function add(entry, cb, ctx) {
+            if (!entry.key) {
+                entry.key = Date.now();
+            }
+
+            this._store.save(entry, cb.bind(ctx));
+        },
+
+        get: function get(id, cb, ctx) {
+            this._store.get(id, cb.bind(ctx));
+        },
+
+        remove: function remove(id, cb, ctx) {
+            this._store.remove(id, cb.bind(ctx));
+        },
+
+        all: function all(cb, ctx) {
+            this._store.all(cb.bind(ctx));
+        }
+    };
+
+    function createStore(cb) {
+        new Lawnchair({adapter:'dom', name: 'diary'}, function (_store) {
+            var store = Object.create(storeProto);
+            store._store = _store;
+            cb(store);
+        });
+    }
+
+    // Diary Entries Controller
+
+    var diaryEntriesProto = {
+        init: function init() {
+            this._addListeners();
+        },
+
+        render: function render() {
+            this.store.all(function (data) {
+                if (!data.length) {
+                    this.$entriesContainer.html('<div class="entries-empty">No entries found =(. Write something now!</div>');
+                } else {
+                    var html = '';
+
+                    $.each(data.reverse(), function (i, entry) {
+                        html += entryTemplate(entry);
+                    });
+
+                    this.$entriesContainer.html(html);
+                    this._collapseAllEntries();
+                }
+            }, this);
+        },
+
+        _addListeners: function _addListeners() {
+            this.$entriesContainer.on('click', '.entry-delete', this._onDelete.bind(this));
+            this.$entriesContainer.on('click', '.entry-edit', this._onEditStart.bind(this));
+            this.$entriesContainer.on('click', '.entry-editCancel', this._onEditCancel.bind(this));
+            this.$entriesContainer.on('submit', '.editEntryForm', this._onSave.bind(this));
+            this.$entriesContainer.on('click', '.entry-title', this._onCollapseToggle.bind(this));
+            this.$entriesContainer.on('click', '.entry-image-header', this._onMapCollapseToggle.bind(this));
+        },
+
+        _onDelete: function _onDelete(e) {
+            var entryId = $(e.target).parents('.entry').data('id');
+            this.store.remove(entryId, this.render, this);
+        },
+
+        _onEditStart: function _onEditStart(e) {
+            var $entry = $(e.target).parents('.entry');
+            this._entryEditMode($entry);
+        },
+
+        _onEditCancel: function _onEditCancel(e) {
+            var $entry = $(e.target).parents('.entry');
+            this._entryNormalMode($entry);
+        },
+
+        _onSave: function _onSave(e) {
+            var entryId = $(e.target).parents('.entry').data('id');
+            var formElems = e.target.elements;
+
+            e.preventDefault();
+
+            this.store.get(entryId, function (entry) {
+                if (entry) {
+                    entry.title = formElems.title.value || entry.title;
+                    entry.content = formElems.content.value || entry.content;
+                    this.store.add(entry, this.render, this);
+                }
+            }, this);
+        },
+
+        _onCollapseToggle: function _onCollapseToggle(e) {
+            var $entry = $(e.target).parent();
+            this._collapseToggleEntry($entry);
+        },
+
+        _onMapCollapseToggle: function _onMapCollapseToggle(e) {
+            $(e.target).next().toggleClass('is-collapsed');
+        },
+
+        _collapseAllEntries: function _collapseAllEntries() {
+            this.$entriesContainer.children('.entry').addClass('is-collapsed');
+        },
+
+        _collapseToggleEntry: function _collapseToggleEntry($entry) {
+            if ($entry.hasClass('is-editing')) { return; }
+
+            $entry.toggleClass('is-collapsed');
+
+            this.$entriesContainer.children().not($entry).addClass('is-collapsed')
+                .find('.entry-image-content').addClass('is-collapsed');
+        },
+
+        _entryEditMode: function _entryEditMode($entry) {
+            var entryId = $entry.data('id');
+
+            this.store.get(entryId, function (entry) {
+                if (entry) {
+                    var editHtml = entryEditTemplate(entry);
+                    $entry.append(editHtml);
+                    $entry.addClass('is-editing');
+                }
+            });
+        },
+
+        _entryNormalMode: function _entryNormalMode($entry) {
+            $entry.removeClass('is-editing');
+            $entry.children('.entry-contentEdit').remove();
+        }
+    };
+
+    // Diary Form Controller
+
+    var diaryFormProto = {
+        init: function init() {
+            this.$form = this.$formContainer.find('.newEntryForm');
+            this.formElems = this.$form[0].elements;
+            this._addListeners();
+        },
+
+        _addListeners: function _addListeners() {
+            this.$form.on('click', 'input[type="submit"]', this._checkForm.bind(this));
+            this.$form.on('submit', this._submitForm.bind(this));
+            this.$formContainer.on('click', '.newEntry-formToggle', this._formToggle.bind(this));
+        },
+
+        _checkForm: function _checkForm() {
+            var title = this.formElems.title.value;
+            var content = this.formElems.content.value;
+
+            this.$form.removeClass('is-error');
+
+            if (title === '' || content === '') {
+                // cause recalculate style
+                this.$form.width();
+                this.$form.addClass('is-error');
+                if (navigator.vibrate) { navigator.vibrate(100); }
+            }
+        },
+
+        _submitForm: function _submitForm(e) {
+            e.preventDefault();
+
+            if (this.$form.hasClass('is-error')) { return; }
+
+            var self = this;
+            var title = this.formElems.title.value;
+            var content = this.formElems.content.value;
+            var entry;
+            var geoTimer;
+
+            entry = {
+                title: title,
+                content: content,
+                date:  Date.now()
+            };
+
+            if (navigator.geolocation) {
+                geoTimer = setTimeout(onGeoFail, 20000);
+                navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoFail, {timeout:10000});
+                this.$form.addClass('is-submitting');
+            } else {
+                onResult();
+            }
+
+            function onGeoSuccess(pos) {
+                if (geoTimer) {
+                    clearTimeout(geoTimer);
+                    entry.geo = {
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude
+                    };
+                    onResult();
+                }
+            }
+
+            function onGeoFail() {
+                clearTimeout(geoTimer);
+                geoTimer = null;
+                onResult();
+            }
+
+            function onResult() {
+                self.$form[0].reset();
+                self.$form.addClass('is-collapsed');
+                self.$form.removeClass('is-submitting');
+
+                self.onSubmit(entry);
+            }
+        },
+
+        _formToggle: function _formToggle() {
+            this.$form.toggleClass('is-collapsed');
+        }
+    };
+
+    // Main
+
+    function main() {
+        var store;
+
+        var diaryEntries = Object.create(diaryEntriesProto);
+        diaryEntries.$entriesContainer = $('#entries');
+
+        var diaryForm = Object.create(diaryFormProto);
+        diaryForm.$formContainer = $('#newEntry');
+
+        diaryForm.onSubmit = function (entry) {
+            store.add(entry, diaryEntries.render, diaryEntries);
+        };
 
         createStore(function (_store) {
             store = _store;
-            addListeners();
-            showEntries();
+            diaryEntries.store = store;
+            diaryEntries.init();
+            diaryEntries.render();
+            diaryForm.init();
         });
     }
 
-    function createStore(cb) {
-        new Lawnchair({adapter:'dom', name: 'diary'}, cb);
-    }
-
-    function addListeners() {
-        $newEntryForm.on('click', 'input[type="submit"]', checkForm);
-        $newEntryForm.on('submit', onNewEntrySubmit);
-        $entriesContainer.on('click', '.entry-delete', onEntryDelete);
-        $entriesContainer.on('click', '.entry-edit', onEntryEditStart);
-        $entriesContainer.on('click', '.entry-editCancel', onEntryEditCancel);
-        $entriesContainer.on('submit', '.editEntryForm', onEntryEditSave);
-        $entriesContainer.on('click', '.entry-title', onEntryCollapse);
-        $entriesContainer.on('click', '.entry-image-header', onEntryImageCollapse);
-        $('#newEntryFormToggle').on('click', onNewEntryFormToggle);
-    }
-
-    function checkForm() {
-        var formElems = $newEntryForm[0].elements;
-        var title = formElems.title.value;
-        var content = formElems.content.value;
-
-        $newEntryForm.removeClass('is-error');
-
-        if (title === '' || content === '') {
-            // cause recalculate style
-            $newEntryForm.width();
-            $newEntryForm.addClass('is-error');
-            if (navigator.vibrate) { navigator.vibrate(100); }
-        }
-    }
-
-    function onNewEntrySubmit(e) {
-        e.preventDefault();
-
-        if ($newEntryForm.hasClass('is-error')) { return; }
-
-        var formElems = $newEntryForm[0].elements;
-        var title = formElems.title.value;
-        var content = formElems.content.value;
-        var entry;
-        var geoTimer;
-
-        entry = {
-            title: title,
-            content: content,
-            date:  Date.now()
-        };
-
-        if (navigator.geolocation) {
-            geoTimer = setTimeout(onGeoFail, 20000);
-            navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoFail, {timeout:10000});
-            $newEntryForm.addClass('is-submitting');
-        } else {
-            saveEntry();
-        }
-
-        function onGeoSuccess(pos) {
-            if (geoTimer) {
-                clearTimeout(geoTimer);
-                entry.geo = {
-                    lat: pos.coords.latitude,
-                    lon: pos.coords.longitude
-                };
-                saveEntry();
-            }
-        }
-
-        function onGeoFail() {
-            clearTimeout(geoTimer);
-            geoTimer = null;
-            saveEntry();
-        }
-
-        function saveEntry() {
-            $newEntryForm[0].reset();
-            $newEntryForm.addClass('is-collapsed');
-            $newEntryForm.removeClass('is-submitting');
-
-            addEntryToStore(entry, showEntries);
-        }
-    }
-
-    function onEntryDelete(e) {
-        var entryId = $(e.target).parents('.entry').data('id');
-        removeEntryFromStore(entryId, showEntries);
-    }
-
-    function onEntryEditStart(e) {
-        var $entry = $(e.target).parents('.entry');
-        entryEditMode($entry);
-    }
-
-    function onEntryEditCancel(e) {
-        var $entry = $(e.target).parents('.entry');
-        entryNormalMode($entry);
-    }
-
-    function onEntryEditSave(e) {
-        var entryId = $(e.target).parents('.entry').data('id');
-        var formElems = e.target.elements;
-
-        e.preventDefault();
-
-        getEntryFromStore(entryId, function (entry) {
-            if (entry) {
-                entry.title = formElems.title.value || entry.title;
-                entry.content = formElems.content.value || entry.content;
-                addEntryToStore(entry, showEntries);
-            }
-        });
-    }
-
-    function onEntryCollapse(e) {
-        var $entry = $(e.target).parent();
-        collapseToggleEntry($entry);
-    }
-
-    function onNewEntryFormToggle() {
-        $newEntryForm.toggleClass('is-collapsed');
-    }
-
-    function onEntryImageCollapse(e) {
-        $(e.target).next().toggleClass('is-collapsed');
-    }
-
-    function addEntryToStore(entry, cb) {
-        if (!entry.key) {
-            entry.key = Date.now();
-        }
-
-        store.save(entry, cb);
-    }
-
-    function getEntryFromStore(id, cb) {
-        store.get(id, cb);
-    }
-
-    function removeEntryFromStore(id, cb) {
-        store.remove(id, cb);
-    }
-
-    function showEntries() {
-        store.all(function (data) {
-            if (!data.length) {
-                $entriesContainer.html('<div class="entries-empty">No entries found =(. Write something now!</div>');
-            } else {
-                var html = '';
-
-                $.each(data.reverse(), function (i, entry) {
-                    html += entryTemplate(entry);
-                });
-
-                $entriesContainer.html(html);
-                collapseAllEntries();
-            }
-        });
-    }
-
-    function entryEditMode($entry) {
-        var entryId = $entry.data('id');
-
-        getEntryFromStore(entryId, function (entry) {
-            if (entry) {
-                var editHtml = entryEditTemplate(entry);
-                $entry.append(editHtml);
-                $entry.addClass('is-editing');
-            } else {
-                // do nothing
-            }
-        });
-    }
-
-    function entryNormalMode($entry) {
-        $entry.removeClass('is-editing');
-        $entry.children('.entry-contentEdit').remove();
-    }
-
-    function collapseToggleEntry($entry) {
-        if ($entry.hasClass('is-editing')) { return; }
-
-        $entry.toggleClass('is-collapsed');
-        $entriesContainer.children().not($entry).addClass('is-collapsed')
-            .find('.entry-image-content').addClass('is-collapsed');
-    }
-
-    function collapseAllEntries() {
-        $entriesContainer.children('.entry').addClass('is-collapsed');
-    }
+    // Template functions. Better use a templating engine,
+    // but it's too much overhead for this assignment.
 
     function entryTemplate(entry) {
         var html = '';
@@ -265,5 +308,52 @@
         return html;
     }
 
-    init();
+    // Polyfills
+
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility
+    if (!Function.prototype.bind) {
+        Function.prototype.bind = function (oThis) {
+            if (typeof this !== 'function') {
+                // closest thing possible to the ECMAScript 5
+                // internal IsCallable function
+                throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+            }
+
+            var aArgs = Array.prototype.slice.call(arguments, 1),
+                fToBind = this,
+                fNOP = function () {},
+                fBound = function () {
+                    return fToBind.apply(this instanceof fNOP && oThis ? this : oThis,
+                        aArgs.concat(Array.prototype.slice.call(arguments)));
+                };
+
+            fNOP.prototype = this.prototype;
+            fBound.prototype = new fNOP();
+
+            return fBound;
+        };
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create#Polyfill
+    if (typeof Object.create != 'function') {
+        (function () {
+            var F = function () {};
+            Object.create = function (o) {
+                if (arguments.length > 1) {
+                  throw Error('Second argument not supported');
+                }
+                if (o === null) {
+                  throw Error('Cannot set a null [[Prototype]]');
+                }
+                if (typeof o != 'object') {
+                  throw TypeError('Argument must be an object');
+                }
+                F.prototype = o;
+                return new F();
+            };
+        })();
+    }
+
+    main();
+
 }());
