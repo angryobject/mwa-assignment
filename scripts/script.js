@@ -64,7 +64,7 @@
             this.$entriesContainer.on('click', '.entry-editCancel', this._onEditCancel.bind(this));
             this.$entriesContainer.on('submit', '.editEntryForm', this._onSave.bind(this));
             this.$entriesContainer.on('click', '.entry-title', this._onCollapseToggle.bind(this));
-            this.$entriesContainer.on('click', '.entry-image-header', this._onMapCollapseToggle.bind(this));
+            this.$entriesContainer.on('click', '.entry-geo-header', this._onMapCollapseToggle.bind(this));
         },
 
         _onDelete: function _onDelete(e) {
@@ -116,7 +116,7 @@
             $entry.toggleClass('is-collapsed');
 
             this.$entriesContainer.children().not($entry).addClass('is-collapsed')
-                .find('.entry-image-content').addClass('is-collapsed');
+                .find('.entry-geo-content').addClass('is-collapsed');
         },
 
         _entryEditMode: function _entryEditMode($entry) {
@@ -262,9 +262,9 @@
         html += '<time class="entry-date">Posted on: ' + new Date(entry.date).toLocaleString() + '</time>';
 
         if (entry.geo) {
-            html += '<div class="entry-image">';
-            html += '<span role="button" class="btn entry-image-header">Show map</span>';
-            html += '<div class="entry-image-content is-collapsed">';
+            html += '<div class="entry-geo">';
+            html += '<span role="button" class="btn entry-geo-header">Show map</span>';
+            html += '<div class="entry-geo-content is-collapsed">';
             html += '<img src="http://maps.googleapis.com/maps/api/staticmap?';
             html += 'center=' + entry.geo.lat + ',' + entry.geo.lon;
             html += '&markers=color:blue%7C' + entry.geo.lat + ',' + entry.geo.lon;

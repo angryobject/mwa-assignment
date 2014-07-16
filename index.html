@@ -9,40 +9,40 @@
     <link rel="stylesheet" href="styles/style.css">
   </head>
   <body>
-  <div class="wrap">
+    <div class="wrap">
 
-    <header>
-      <h1 class="heading">My Diary Entries</h1>
-    </header>
+      <header>
+        <h1 class="heading">My Diary Entries</h1>
+      </header>
 
-    <main>
-      <aside>
-        <div class="newEntry" id="newEntry">
-          <div class="newEntry-header">
-            <h2 role="button" class="btn newEntry-formToggle">Add new entry</h2>
+      <main>
+        <aside>
+          <div class="newEntry" id="newEntry">
+            <div class="newEntry-header">
+              <h2 role="button" class="btn newEntry-formToggle">Add new entry</h2>
+            </div>
+            <form class="entryForm newEntryForm is-collapsed">
+              <label>
+                <span>Title:</span>
+                <input required type="text" name="title" placeholder="How my day went">
+              </label>
+              <label>
+                <span>Content:</span>
+                <textarea required name="content" placeholder="Today I had an amazing day!"></textarea>
+              </label>
+              <input class="btn" type="submit" value="Create!">
+            </form>
           </div>
-          <form class="entryForm newEntryForm is-collapsed">
-            <label>
-              <span>Title:</span>
-              <input required type="text" name="title" placeholder="How my day went">
-            </label>
-            <label>
-              <span>Content:</span>
-              <textarea required name="content" placeholder="Today I had an amazing day!"></textarea>
-            </label>
-            <input class="btn" type="submit" value="Create!">
-          </form>
-        </div>
-      </aside>
-      <div class="entries" id="entries"></div>
-    </main>
+        </aside>
+        <div class="entries" id="entries"></div>
+      </main>
 
-    <div class="footer footer-push"></div>
-    <footer class="footer">
-      MWA Assignment © Max Shishkin
-    </foorer>
+      <div class="footer footer-push"></div>
+      <footer class="footer">
+        MWA Assignment © Max Shishkin
+      </foorer>
 
-  </div>
+    </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/zepto/1.1.3/zepto.min.js"></script>
     <script>
